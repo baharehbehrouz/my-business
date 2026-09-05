@@ -3,153 +3,186 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مدیریت هوشمند بیزینس</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مدیریت هوشمند | انبار و فروش</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
     <style>
-        body { font-family: 'Vazirmatn', sans-serif; background-color: #f8fafc; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Vazirmatn', sans-serif; background-color: #f8fafc; user-select: none; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
+        .low-stock { background-color: #fee2e2; border-color: #ef4444; }
     </style>
 </head>
-<body class="pb-20 select-none">
+<body class="pb-24">
 
     <!-- Header -->
-    <header class="bg-indigo-700 text-white p-6 rounded-b-3xl shadow-lg mb-6 sticky top-0 z-50">
+    <header class="bg-indigo-700 text-white p-6 rounded-b-[2.5rem] shadow-lg mb-6 sticky top-0 z-50">
         <div class="flex justify-between items-center">
             <div>
-                <h1 class="text-xl font-black">پیشخوان مدیریت</h1>
+                <h1 class="text-xl font-black">مدیریت هوشمند</h1>
                 <p class="text-[10px] opacity-80" id="current-date"></p>
             </div>
-            <div class="bg-white/20 p-2 rounded-full">
-                <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+            <div class="bg-white/20 p-2 rounded-xl backdrop-blur-md">
+                <i data-lucide="shield-check" class="w-5 h-5"></i>
             </div>
         </div>
     </header>
 
     <div id="app" class="px-4">
-        <!-- Dashboard Tab -->
+        
+        <!-- صفحه داشبورد -->
         <div id="dashboard" class="tab-content active">
-            <!-- Stats -->
             <div class="grid grid-cols-2 gap-4 mb-6">
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
-                    <p class="text-slate-500 text-[10px] mb-1">فروش کل</p>
-                    <p class="text-indigo-600 font-black text-sm" id="total-sales">۰ تومان</p>
+                <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100">
+                    <p class="text-slate-400 text-[10px] mb-1">فروش کل</p>
+                    <p class="text-indigo-600 font-black text-lg" id="total-sales">۰</p>
                 </div>
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
-                    <p class="text-slate-500 text-[10px] mb-1">سود خالص</p>
-                    <p class="text-emerald-600 font-black text-sm" id="total-profit">۰ تومان</p>
+                <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100">
+                    <p class="text-slate-400 text-[10px] mb-1">سود خالص</p>
+                    <p class="text-emerald-600 font-black text-lg" id="total-profit">۰</p>
                 </div>
             </div>
-
-            <!-- Recent Transactions -->
             <h3 class="text-sm font-bold mb-4 flex items-center gap-2">
-                <i data-lucide="history" class="w-4 h-4 text-slate-400"></i>
-                آخرین فاکتورها
+                <i data-lucide="zap" class="w-4 h-4 text-amber-500"></i> آخرین فعالیت‌ها
             </h3>
-            <div id="transaction-list" class="space-y-3">
-                <!-- Transactions will appear here -->
+            <div id="recent-list" class="space-y-3"></div>
+        </div>
+
+        <!-- صفحه فروش (فاکتور) -->
+        <div id="sales" class="tab-content">
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+                <h3 class="font-bold mb-6 text-indigo-700 flex items-center gap-2">
+                    <i data-lucide="shopping-cart"></i> ثبت فاکتور فروش
+                </h3>
+                <div class="space-y-4">
+                    <input type="text" id="sale-cust" class="w-full p-4 bg-slate-50 rounded-2xl outline-none border-none focus:ring-2 ring-indigo-500" placeholder="نام مشتری">
+                    <select id="sale-prod" class="w-full p-4 bg-slate-50 rounded-2xl outline-none border-none focus:ring-2 ring-indigo-500">
+                        <option value="">انتخاب کالا از انبار...</option>
+                    </select>
+                    <input type="number" id="sale-qty" class="w-full p-4 bg-slate-50 rounded-2xl outline-none border-none focus:ring-2 ring-indigo-500" placeholder="تعداد">
+                    <button onclick="submitSale()" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold shadow-lg active:scale-95 transition-all">تایید و کسر از انبار</button>
+                </div>
             </div>
         </div>
 
-        <!-- Sales Form Tab -->
-        <div id="sales" class="tab-content">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                <h3 class="font-bold mb-6 text-indigo-700">ثبت فاکتور جدید</h3>
-                <div class="space-y-5">
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">نام مشتری</label>
-                        <input type="text" id="cust-name" class="w-full p-4 bg-slate-50 border-none rounded-xl outline-none focus:ring-2 ring-indigo-500" placeholder="مثلاً: احمدی">
+        <!-- صفحه انبارداری -->
+        <div id="inventory" class="tab-content">
+            <div class="bg-indigo-50 p-6 rounded-3xl mb-6 border border-indigo-100">
+                <h3 class="font-bold mb-4 text-indigo-800 text-sm">افزودن کالا به انبار</h3>
+                <div class="grid grid-cols-1 gap-3 text-sm">
+                    <input type="text" id="inv-title" placeholder="نام کالا" class="p-3 rounded-xl border-none outline-none">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="number" id="inv-price" placeholder="قیمت فروش" class="p-3 rounded-xl border-none outline-none">
+                        <input type="number" id="inv-cost" placeholder="قیمت خرید" class="p-3 rounded-xl border-none outline-none">
                     </div>
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">مبلغ فروش (تومان)</label>
-                        <input type="number" id="sale-price" class="w-full p-4 bg-slate-50 border-none rounded-xl outline-none focus:ring-2 ring-indigo-500" placeholder="0">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">هزینه خرید/تولید (تومان)</label>
-                        <input type="number" id="cost-price" class="w-full p-4 bg-slate-50 border-none rounded-xl outline-none focus:ring-2 ring-indigo-500" placeholder="0">
-                    </div>
-                    <button onclick="saveTransaction()" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold mt-4 shadow-lg active:scale-95 transition-transform">تایید و ثبت نهایی</button>
+                    <input type="number" id="inv-stock" placeholder="موجودی اولیه" class="p-3 rounded-xl border-none outline-none">
+                    <button onclick="addInventory()" class="bg-indigo-600 text-white p-3 rounded-xl font-bold">ذخیره در انبار</button>
                 </div>
             </div>
+            <h3 class="font-bold mb-4 text-sm">لیست موجودی کالاها</h3>
+            <div id="inventory-list" class="space-y-3"></div>
         </div>
     </div>
 
     <!-- Navigation -->
-    <nav class="fixed bottom-4 left-4 right-4 bg-white/80 backdrop-blur-lg border border-white shadow-2xl rounded-2xl flex justify-around p-3 z-50">
-        <button onclick="showTab('dashboard')" id="btn-dashboard" class="flex flex-col items-center text-indigo-600 transition-colors">
-            <i data-lucide="home"></i>
-            <span class="text-[9px] mt-1 font-bold">داشبورد</span>
+    <nav class="fixed bottom-6 left-6 right-6 bg-white/90 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[2rem] flex justify-around p-3 z-50">
+        <button onclick="showTab('dashboard')" class="nav-btn flex flex-col items-center text-indigo-600" id="nav-dashboard">
+            <i data-lucide="home"></i><span class="text-[9px] mt-1 font-bold">داشبورد</span>
         </button>
-        <button onclick="showTab('sales')" id="btn-sales" class="flex flex-col items-center text-slate-400 transition-colors">
-            <i data-lucide="plus-square"></i>
-            <span class="text-[9px] mt-1 font-bold">فاکتور جدید</span>
+        <button onclick="showTab('sales')" class="nav-btn flex flex-col items-center text-slate-400" id="nav-sales">
+            <i data-lucide="plus-circle"></i><span class="text-[9px] mt-1 font-bold">فروش</span>
+        </button>
+        <button onclick="showTab('inventory')" class="nav-btn flex flex-col items-center text-slate-400" id="nav-inventory">
+            <i data-lucide="box"></i><span class="text-[9px] mt-1 font-bold">انبار</span>
         </button>
     </nav>
 
     <script>
-        let transactions = JSON.parse(localStorage.getItem('biz_data')) || [];
+        let db = JSON.parse(localStorage.getItem('smart_biz_db')) || { products: [], sales: [] };
 
-        function showTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            
-            document.getElementById('btn-dashboard').className = tabId === 'dashboard' ? 'flex flex-col items-center text-indigo-600' : 'flex flex-col items-center text-slate-400';
-            document.getElementById('btn-sales').className = tabId === 'sales' ? 'flex flex-col items-center text-indigo-600' : 'flex flex-col items-center text-slate-400';
-            
-            if(tabId === 'dashboard') updateDashboard();
+        function showTab(id) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.replace('text-indigo-600', 'text-slate-400'));
+            document.getElementById('nav-' + id).classList.replace('text-slate-400', 'text-indigo-600');
+            if(id === 'dashboard') updateDashboard();
+            if(id === 'inventory') renderInventory();
+            if(id === 'sales') populateProductSelect();
+            lucide.createIcons();
         }
 
-        function saveTransaction() {
-            const name = document.getElementById('cust-name').value;
-            const price = parseInt(document.getElementById('sale-price').value) || 0;
-            const cost = parseInt(document.getElementById('cost-price').value) || 0;
+        function addInventory() {
+            const title = document.getElementById('inv-title').value;
+            const price = parseInt(document.getElementById('inv-price').value) || 0;
+            const cost = parseInt(document.getElementById('inv-cost').value) || 0;
+            const stock = parseInt(document.getElementById('inv-stock').value) || 0;
 
-            if(!name || price <= 0) return alert('نام مشتری و مبلغ فروش را وارد کنید');
+            if(!title || price <= 0) return alert('اطلاعات کالا ناقص است');
 
-            const newTx = {
-                id: Date.now(),
-                customer: name,
-                amount: price,
-                profit: price - cost,
-                date: new Date().toLocaleTimeString('fa-IR')
-            };
-
-            transactions.push(newTx);
-            localStorage.setItem('biz_data', JSON.stringify(transactions));
-            
-            document.querySelectorAll('input').forEach(i => i.value = '');
-            showTab('dashboard');
+            db.products.push({ id: Date.now(), title, price, cost, stock });
+            save();
+            document.querySelectorAll('#inventory input').forEach(i => i.value = '');
+            renderInventory();
         }
 
-        function updateDashboard() {
-            const totalSales = transactions.reduce((sum, t) => sum + t.amount, 0);
-            const totalProfit = transactions.reduce((sum, t) => sum + t.profit, 0);
-
-            document.getElementById('total-sales').innerText = totalSales.toLocaleString('fa-IR') + ' تومان';
-            document.getElementById('total-profit').innerText = totalProfit.toLocaleString('fa-IR') + ' تومان';
-
-            const list = document.getElementById('transaction-list');
-            if(transactions.length === 0) {
-                list.innerHTML = '<p class="text-center text-slate-400 text-xs mt-10">هیچ فاکتوری ثبت نشده است</p>';
-                return;
-            }
-
-            list.innerHTML = transactions.slice().reverse().map(t => `
-                <div class="bg-white p-4 rounded-xl flex justify-between items-center shadow-sm border border-slate-50">
+        function renderInventory() {
+            const list = document.getElementById('inventory-list');
+            list.innerHTML = db.products.map(p => `
+                <div class="bg-white p-4 rounded-2xl flex justify-between items-center border ${p.stock < 5 ? 'low-stock border-red-200' : 'border-slate-50'} shadow-sm">
                     <div>
-                        <p class="text-sm font-bold text-slate-700">${t.customer}</p>
-                        <p class="text-[10px] text-slate-400">${t.date}</p>
+                        <p class="font-bold text-sm">${p.title}</p>
+                        <p class="text-[10px] text-slate-400">قیمت فروش: ${p.price.toLocaleString('fa-IR')} ت</p>
                     </div>
                     <div class="text-left">
-                        <p class="text-sm font-black text-indigo-600">${t.amount.toLocaleString('fa-IR')} ت</p>
-                        <p class="text-[9px] text-emerald-500">سود: ${t.profit.toLocaleString('fa-IR')}</p>
+                        <p class="text-xs font-black ${p.stock < 5 ? 'text-red-600' : 'text-indigo-600'}">موجودی: ${p.stock.toLocaleString('fa-IR')}</p>
                     </div>
                 </div>
             `).join('');
         }
+
+        function populateProductSelect() {
+            const select = document.getElementById('sale-prod');
+            select.innerHTML = '<option value="">انتخاب کالا...</option>' + 
+                db.products.map(p => `<option value="${p.id}">${p.title} (موجودی: ${p.stock})</option>`).join('');
+        }
+
+        function submitSale() {
+            const cust = document.getElementById('sale-cust').value;
+            const pId = document.getElementById('sale-prod').value;
+            const qty = parseInt(document.getElementById('sale-qty').value) || 0;
+
+            const product = db.products.find(p => p.id == pId);
+            if(!product || product.stock < qty || qty <= 0) return alert('موجودی انبار کافی نیست یا کالا انتخاب نشده');
+
+            product.stock -= qty;
+            const amount = product.price * qty;
+            const profit = (product.price - product.cost) * qty;
+
+            db.sales.push({ id: Date.now(), customer: cust, product: product.title, amount, profit, date: new Date().toLocaleTimeString('fa-IR') });
+            save();
+            alert('فروش با موفقیت ثبت و از انبار کسر شد');
+            document.querySelectorAll('#sales input').forEach(i => i.value = '');
+            showTab('dashboard');
+        }
+
+        function updateDashboard() {
+            const totalS = db.sales.reduce((a, b) => a + b.amount, 0);
+            const totalP = db.sales.reduce((a, b) => a + b.profit, 0);
+            document.getElementById('total-sales').innerText = totalS.toLocaleString('fa-IR') + ' ت';
+            document.getElementById('total-profit').innerText = totalP.toLocaleString('fa-IR') + ' ت';
+
+            const list = document.getElementById('recent-list');
+            list.innerHTML = db.sales.slice(-5).reverse().map(s => `
+                <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm">
+                    <div><p class="text-xs font-bold">${s.customer}</p><p class="text-[9px] text-slate-400">${s.product}</p></div>
+                    <div class="text-left"><p class="text-xs font-bold text-indigo-600">${s.amount.toLocaleString('fa-IR')} ت</p></div>
+                </div>
+            `).join('');
+        }
+
+        function save() { localStorage.setItem('smart_biz_db', JSON.stringify(db)); }
 
         document.getElementById('current-date').innerText = new Date().toLocaleDateString('fa-IR', { weekday: 'long', day: 'numeric', month: 'long' });
         lucide.createIcons();
